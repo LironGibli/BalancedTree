@@ -52,11 +52,76 @@ public class BalancedTree {
             }
         }
     };
-    public void delete(Key key){};
-    public Value search(Key key){};
-    public int rank(Key key){};
-    public Key select(int index){};
-    public Value sumValuesInInterval (Key key1, Key key2){};
+    public void delete(Key key) {
+        Node nodeToDelete = keySearch(root, key);
+        if (nodeToDelete != null) {
+            Node nodeParent = nodeToDelete.p;
+            if ((nodeParent == root) && (nodeParent.middle == null)) {
+                nodeParent.left = null;
+                nodeParent.key = null;
+            }
+            else {
+                if (nodeToDelete == nodeParent.left) {
+                    setChildren(nodeParent, nodeParent.middle, nodeParent.right, null);
+                }
+                else if (nodeToDelete == nodeParent.middle) {
+                    setChildren(nodeParent, nodeParent.left, nodeParent.right, null);
+                }
+                else {
+                    setChildren(nodeParent, nodeParent.left, nodeParent.middle, null);
+                }
+                while (nodeParent != null) {
+                    if (nodeParent.middle == null) {
+                        if (nodeParent != root) {
+                            nodeParent = borrowOrMerge(nodeParent);
+                        }
+                        else {
+                            if (!(nodeParent.left.getClass().getSimpleName().equals(Leaf.class.getSimpleName()))) {
+                                root = (InternalNode) nodeParent.left;
+                                nodeParent.left.p = null;
+                                return;
+                            }
+                            else {
+                                updateKey(nodeParent);
+                                nodeParent = nodeParent.p;
+                            }
+                        }
+                    }
+                    else {
+                        updateKey(nodeParent);
+                        nodeParent = nodeParent.p;
+                    }
+                }
+            }
+        }
+    };
+    public Value search(Key key){
+        Leaf foundNode = keySearch(root,key);
+        if (foundNode != null){
+            return foundNode.value.createCopy();
+        }
+        else{
+            return null;
+        }
+    };
+//    public int rank(Key key){
+////        Leaf foundNode = keySearch(root,key);
+////        if (foundNode != null){
+////           int rank = 1;
+////           Node nodeParent = foundNode.p;
+////           while (nodeParent != null){
+//////               if (foundNode == nodeParent.middle){
+//////               }
+////           }
+////        }
+////        else{
+////            return 0;
+////        }
+//    };
+
+
+//    public Key select(int index){};
+//    public Value sumValuesInInterval (Key key1, Key key2){};
 
     private void updateKey(Node node){
         node.key = node.left.key;
@@ -111,4 +176,71 @@ public class BalancedTree {
         }
         return parentSibling;
     }
+    private Node borrowOrMerge(Node node){
+        Node nodeParent = node.p;
+        if(node == nodeParent.left){
+            Node nodeSibling = nodeParent.middle;
+            if (nodeSibling.right != null) {
+                setChildren(node, node.left, nodeSibling.left, null);
+                setChildren(nodeSibling, nodeSibling.middle, nodeSibling.right, null);
+            } else {
+                setChildren(nodeSibling, node.left, nodeSibling.left, nodeSibling.middle);
+                //GARBAGE COLLECT THE NODE
+                setChildren(nodeParent, nodeSibling, nodeParent.right, null);
+            }
+            return nodeParent;
+        }
+        else if(node == nodeParent.middle){
+            Node nodeSibling = nodeParent.left;
+            if (nodeSibling.right != null) {
+                setChildren(node, nodeSibling.right, node.left, null);
+                setChildren(nodeSibling, nodeSibling.left, nodeSibling.middle, null);
+            } else {
+                setChildren(nodeSibling, nodeSibling.left, nodeSibling.middle, node.left);
+                //GARBAGE COLLECT THE NODE
+                setChildren(nodeParent, nodeSibling, nodeParent.right, null);
+            }
+            return nodeParent;
+        }
+        Node nodeSibling = nodeParent.middle;
+        if (nodeSibling.right != null) {
+            setChildren(node, nodeSibling.right, node.left, null);
+            setChildren(nodeSibling, nodeSibling.left, nodeSibling.middle, null);
+        } else {
+            setChildren(nodeSibling, nodeSibling.left, nodeSibling.middle, node.left);
+            //GARBAGE COLLECT THE NODE
+            setChildren(nodeParent, nodeParent.left, nodeSibling, null);
+        }
+        return nodeParent;
+        }
+    private Leaf keySearch(Node node, Key key){
+        if(node.getClass().getSimpleName().equals(Leaf.class.getSimpleName())){
+            if(node.key == key){
+                return (Leaf)node;
+            }
+            else{
+                return null;
+            }
+        }
+        if(key.compareTo(node.left.key)<=0){
+            return keySearch(node.left, key);
+        }
+        else if(key.compareTo(node.middle.key)<=0){
+            return keySearch(node.middle, key);
+        }
+        else{
+            if((node.right != null) && (key.compareTo(node.right.key)<=0)){
+                return keySearch(node.right, key);
+            }
+            else{
+                return null;
+            }
+        }
+    }
+//    public static void main(String[] args) {
+//        Node a = new Leaf(new MyKey("ss",1),new MyValue(1));
+//        Node b = new InternalNode();
+//        System.out.println(a.getClass().getSimpleName().equals(b.getClass().getSimpleName()));
+//
+//    }
 }
