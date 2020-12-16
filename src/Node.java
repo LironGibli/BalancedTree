@@ -4,7 +4,9 @@ public abstract class Node {
     Node right; // pointer to right child in T
     Node p; // pointer to parent in T
     public Key key; // maximum key in its subtree
+    public Key minKey; // minimum key in its subtree
     int size;
+    Value sum;
     Node(){
         left = null;
         middle = null;
@@ -12,6 +14,7 @@ public abstract class Node {
         p = null;
         key = null;
         size = 0;
+        sum = null;
     }
 //    public Node getLeft() {
 //        return left;

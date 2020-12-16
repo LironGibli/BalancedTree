@@ -127,22 +127,37 @@ public class BalancedTree {
             return 0;
         }
     };
-
-
-//    public Key select(int index){};
-//    public Value sumValuesInInterval (Key key1, Key key2){};
-
+    public Key select(int index){
+        if (index < 1){
+            return null;
+        }
+        else{
+            Node foundNode = selectRecursive(root, index);
+            if (foundNode != null){
+                return foundNode.key.createCopy();
+            }
+            else {
+                return null;
+            }
+        }
+    };
+    public Value sumValuesInInterval (Key key1, Key key2){
+        return sumValuesInIntervalRecursive(root, key1, key2);
+        }
     private void updateKey(Node node){
-        node.size = 0;
         node.key = node.left.key;
-        node.size += node.left.size;
+        node.minKey = node.left.minKey;
+        node.size = node.left.size;
+        node.sum = node.left.sum;
         if (node.middle != null) {
             node.key = node.middle.key;
             node.size += node.middle.size;
+            node.sum.addValue(node.middle.sum);
         }
         if (node.right != null) {
             node.key = node.right.key;
             node.size += node.right.size;
+            node.sum.addValue(node.right.sum);
         }
     }
     private void setChildren(Node parent, Node left, Node middle, Node right){
@@ -249,6 +264,59 @@ public class BalancedTree {
                 return null;
             }
         }
+    }
+    private Node selectRecursive(Node node,int index){
+        if (node.size < index){
+            return null;
+        }
+        if (node.getClass().getSimpleName().equals(Leaf.class.getSimpleName())){
+            return node;
+        }
+        int sizeLeft = node.left.size;
+        int sizeLeftMiddle = node.left.size + node.middle.size;
+        if (index <= sizeLeft){
+            return selectRecursive(node.left, index);
+        }
+        else if (index <= sizeLeftMiddle){
+            return selectRecursive(node.middle, index - sizeLeft);
+        }
+        else{
+            return selectRecursive(node.right, index - sizeLeftMiddle);
+        }
+    }
+    private Value sumValuesInIntervalRecursive(Node node,Key key1, Key key2){
+        if ((node.minKey.compareTo(key1) >= 0) && (node.key.compareTo(key2) <= 0)){
+            return node.sum;
+        }
+        else if ((node.minKey.compareTo(key2) > 0) || (node.key.compareTo(key1) < 0)){
+            return null;
+        }
+        else{
+            Value val1 = sumValuesInIntervalRecursive(node.left, key1, key2);
+            Value val2 = null;
+            if (node.middle != null) {
+                val2 = sumValuesInIntervalRecursive(node.middle, key1, key2);
+            }
+            Value val3 = null;
+            if (node.right != null) {
+                val3 = sumValuesInIntervalRecursive(node.right, key1, key2);
+            }
+            if (val1 != null){
+                val1.addValue(val2);
+                val1.addValue(val3);
+                return val1;
+            }
+            else if (val2 != null){
+                val2.addValue(val3);
+                return val2;
+            }
+            else{
+                return val3;
+            }
+        }
+
+
+
     }
 //    public static void main(String[] args) {
 //        Node a = new Leaf(new MyKey("ss",1),new MyValue(1));
