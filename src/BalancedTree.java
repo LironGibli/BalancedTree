@@ -302,12 +302,18 @@ public class BalancedTree {
                 val3 = sumValuesInIntervalRecursive(node.right, key1, key2);
             }
             if (val1 != null){
-                val1.addValue(val2);
-                val1.addValue(val3);
+                if (val2 != null) {
+                    val1.addValue(val2);
+                }
+                if (val3 != null){
+                    val1.addValue(val3);
+                }
                 return val1;
             }
             else if (val2 != null){
-                val2.addValue(val3);
+                if (val3 != null) {
+                    val2.addValue(val3);
+                }
                 return val2;
             }
             else{
