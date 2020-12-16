@@ -3,5 +3,6 @@ public class Leaf extends Node{
     Leaf(Key key, Value value){
         this.key = key;
         this.value = value;
+        this.size = 1;
     }
 }

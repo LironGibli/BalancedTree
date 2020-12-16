@@ -59,6 +59,7 @@ public class BalancedTree {
             if ((nodeParent == root) && (nodeParent.middle == null)) {
                 nodeParent.left = null;
                 nodeParent.key = null;
+                nodeParent.size = 0;
             }
             else {
                 if (nodeToDelete == nodeParent.left) {
@@ -104,32 +105,44 @@ public class BalancedTree {
             return null;
         }
     };
-//    public int rank(Key key){
-////        Leaf foundNode = keySearch(root,key);
-////        if (foundNode != null){
-////           int rank = 1;
-////           Node nodeParent = foundNode.p;
-////           while (nodeParent != null){
-//////               if (foundNode == nodeParent.middle){
-//////               }
-////           }
-////        }
-////        else{
-////            return 0;
-////        }
-//    };
+    public int rank(Key key){
+        Leaf foundNode = keySearch(root,key);
+        if (foundNode != null){
+           int rank = 1;
+           Node nodeParent = foundNode.p;
+           Node climbingNode = foundNode;
+           while (nodeParent != null){
+               if (climbingNode == nodeParent.middle){
+                   rank += nodeParent.left.size;
+               }
+               else if(climbingNode == nodeParent.right){
+                   rank += nodeParent.left.size + nodeParent.middle.size;
+               }
+               climbingNode = nodeParent;
+               nodeParent = nodeParent.p;
+           }
+           return rank;
+        }
+        else{
+            return 0;
+        }
+    };
 
 
 //    public Key select(int index){};
 //    public Value sumValuesInInterval (Key key1, Key key2){};
 
     private void updateKey(Node node){
+        node.size = 0;
         node.key = node.left.key;
+        node.size += node.left.size;
         if (node.middle != null) {
             node.key = node.middle.key;
+            node.size += node.middle.size;
         }
         if (node.right != null) {
             node.key = node.right.key;
+            node.size += node.right.size;
         }
     }
     private void setChildren(Node parent, Node left, Node middle, Node right){

@@ -4,12 +4,14 @@ public abstract class Node {
     Node right; // pointer to right child in T
     Node p; // pointer to parent in T
     public Key key; // maximum key in its subtree
+    int size;
     Node(){
-        Node left = null;
-        Node middle = null;
-        Node right = null;
-        Node p = null;
-        Key key = null;
+        left = null;
+        middle = null;
+        right = null;
+        p = null;
+        key = null;
+        size = 0;
     }
 //    public Node getLeft() {
 //        return left;
