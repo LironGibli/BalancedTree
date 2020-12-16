@@ -320,14 +320,5 @@ public class BalancedTree {
                 return val3;
             }
         }
-
-
-
     }
-//    public static void main(String[] args) {
-//        Node a = new Leaf(new MyKey("ss",1),new MyValue(1));
-//        Node b = new InternalNode();
-//        System.out.println(a.getClass().getSimpleName().equals(b.getClass().getSimpleName()));
-//
-//    }
 }
