@@ -36,7 +36,7 @@ public class BalancedTree {
             }
             Node parent = placementNode.p;
             Node climbingNode = insertAndSplit(parent, newLeaf);
-            while (parent != root){
+            while (!parent.equals(root)){
                 parent = parent.p;
                 if(climbingNode != null){
                     climbingNode = insertAndSplit(parent, climbingNode);
@@ -51,21 +51,23 @@ public class BalancedTree {
                 root = newRoot;
             }
         }
-    };
+    }
     public void delete(Key key) {
         Node nodeToDelete = keySearch(root, key);
         if (nodeToDelete != null) {
             Node nodeParent = nodeToDelete.p;
-            if ((nodeParent == root) && (nodeParent.middle == null)) {
+            if ((nodeParent.equals(root)) && (nodeParent.middle == null)) {
                 nodeParent.left = null;
                 nodeParent.key = null;
+                nodeParent.minKey = null;
+                nodeParent.sum = null;
                 nodeParent.size = 0;
             }
             else {
-                if (nodeToDelete == nodeParent.left) {
+                if (nodeToDelete.equals(nodeParent.left)) {
                     setChildren(nodeParent, nodeParent.middle, nodeParent.right, null);
                 }
-                else if (nodeToDelete == nodeParent.middle) {
+                else if (nodeToDelete.equals(nodeParent.middle)) {
                     setChildren(nodeParent, nodeParent.left, nodeParent.right, null);
                 }
                 else {
@@ -73,7 +75,7 @@ public class BalancedTree {
                 }
                 while (nodeParent != null) {
                     if (nodeParent.middle == null) {
-                        if (nodeParent != root) {
+                        if (!nodeParent.equals(root)) {
                             nodeParent = borrowOrMerge(nodeParent);
                         }
                         else {
@@ -95,7 +97,7 @@ public class BalancedTree {
                 }
             }
         }
-    };
+    }
     public Value search(Key key){
         Leaf foundNode = keySearch(root,key);
         if (foundNode != null){
@@ -104,7 +106,7 @@ public class BalancedTree {
         else{
             return null;
         }
-    };
+    }
     public int rank(Key key){
         Leaf foundNode = keySearch(root,key);
         if (foundNode != null){
@@ -112,10 +114,10 @@ public class BalancedTree {
            Node nodeParent = foundNode.p;
            Node climbingNode = foundNode;
            while (nodeParent != null){
-               if (climbingNode == nodeParent.middle){
+               if (climbingNode.equals(nodeParent.middle)){
                    rank += nodeParent.left.size;
                }
-               else if(climbingNode == nodeParent.right){
+               else if(climbingNode.equals(nodeParent.right)){
                    rank += nodeParent.left.size + nodeParent.middle.size;
                }
                climbingNode = nodeParent;
@@ -126,7 +128,7 @@ public class BalancedTree {
         else{
             return 0;
         }
-    };
+    }
     public Key select(int index){
         if (index < 1){
             return null;
@@ -140,7 +142,7 @@ public class BalancedTree {
                 return null;
             }
         }
-    };
+    }
     public Value sumValuesInInterval (Key key1, Key key2){
         return sumValuesInIntervalRecursive(root, key1, key2);
         }
@@ -148,7 +150,7 @@ public class BalancedTree {
         node.key = node.left.key;
         node.minKey = node.left.minKey;
         node.size = node.left.size;
-        node.sum = node.left.sum;
+        node.sum = node.left.sum.createCopy();
         if (node.middle != null) {
             node.key = node.middle.key;
             node.size += node.middle.size;
@@ -206,7 +208,7 @@ public class BalancedTree {
     }
     private Node borrowOrMerge(Node node){
         Node nodeParent = node.p;
-        if(node == nodeParent.left){
+        if(node.equals(nodeParent.left)){
             Node nodeSibling = nodeParent.middle;
             if (nodeSibling.right != null) {
                 setChildren(node, node.left, nodeSibling.left, null);
@@ -218,7 +220,7 @@ public class BalancedTree {
             }
             return nodeParent;
         }
-        else if(node == nodeParent.middle){
+        else if(node.equals(nodeParent.middle)){
             Node nodeSibling = nodeParent.left;
             if (nodeSibling.right != null) {
                 setChildren(node, nodeSibling.right, node.left, null);
@@ -242,8 +244,11 @@ public class BalancedTree {
         return nodeParent;
         }
     private Leaf keySearch(Node node, Key key){
+        if(node.equals(root) && node.left == null){
+            return null;
+        }
         if(node.getClass().getSimpleName().equals(Leaf.class.getSimpleName())){
-            if(node.key == key){
+            if(node.key.compareTo(key) == 0 ){
                 return (Leaf)node;
             }
             else{
@@ -253,7 +258,7 @@ public class BalancedTree {
         if(key.compareTo(node.left.key)<=0){
             return keySearch(node.left, key);
         }
-        else if(key.compareTo(node.middle.key)<=0){
+        else if((node.middle != null) && key.compareTo(node.middle.key)<=0){
             return keySearch(node.middle, key);
         }
         else{
@@ -272,12 +277,15 @@ public class BalancedTree {
         if (node.getClass().getSimpleName().equals(Leaf.class.getSimpleName())){
             return node;
         }
+        int sizeLeftMiddle = 0;
         int sizeLeft = node.left.size;
-        int sizeLeftMiddle = node.left.size + node.middle.size;
+        if (node.middle != null){
+            sizeLeftMiddle = sizeLeft + node.middle.size;
+        }
         if (index <= sizeLeft){
             return selectRecursive(node.left, index);
         }
-        else if (index <= sizeLeftMiddle){
+        else if (index <= sizeLeftMiddle && node.middle != null){
             return selectRecursive(node.middle, index - sizeLeft);
         }
         else{
@@ -285,8 +293,11 @@ public class BalancedTree {
         }
     }
     private Value sumValuesInIntervalRecursive(Node node,Key key1, Key key2){
+        if(node.equals(root) && node.left == null){
+            return null;
+        }
         if ((node.minKey.compareTo(key1) >= 0) && (node.key.compareTo(key2) <= 0)){
-            return node.sum;
+            return node.sum.createCopy();
         }
         else if ((node.minKey.compareTo(key2) > 0) || (node.key.compareTo(key1) < 0)){
             return null;
