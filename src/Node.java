@@ -3,8 +3,8 @@ public abstract class Node {
     Node middle; // pointer to middle child in T
     Node right; // pointer to right child in T
     Node p; // pointer to parent in T
-    public Key key; // maximum key in its subtree
-    public Key minKey; // minimum key in its subtree
+    Key key; // maximum key in its subtree
+    Key minKey; // minimum key in its subtree
     int size;
     Value sum;
     Node(){
@@ -16,42 +16,4 @@ public abstract class Node {
         size = 0;
         sum = null;
     }
-//    public Node getLeft() {
-//        return left;
-//    }
-//
-//    public void setLeft(Node left) {
-//        this.left = left;
-//    }
-//    public Node getMiddle() {
-//        return middle;
-//    }
-//
-//    public void setMiddle(Node middle) {
-//        this.middle = middle;
-//    }
-//
-//    public Node getRight() {
-//        return right;
-//    }
-//
-//    public void setRight(Node right) {
-//        this.right = right;
-//    }
-//
-//    public Node getP() {
-//        return p;
-//    }
-//
-//    public void setP(Node p) {
-//        this.p = p;
-//    }
-//
-//    public Key getKey() {
-//        return key;
-//    }
-//
-//    public void setKey(Key key) {
-//        this.key = key;
-//    }
 }

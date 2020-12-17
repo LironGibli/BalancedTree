@@ -18,7 +18,7 @@ public class BalancedTree {
             }
         }
         else{
-            while (!placementNode.getClass().getSimpleName().equals(newLeaf.getClass().getSimpleName())){
+            while (!(placementNode instanceof Leaf)){
                 if (newLeaf.key.compareTo(placementNode.left.key) < 0){
                     placementNode = placementNode.left;
                 }
@@ -79,7 +79,7 @@ public class BalancedTree {
                             nodeParent = borrowOrMerge(nodeParent);
                         }
                         else {
-                            if (!(nodeParent.left.getClass().getSimpleName().equals(Leaf.class.getSimpleName()))) {
+                            if (!(nodeParent.left instanceof Leaf)) {
                                 root = (InternalNode) nodeParent.left;
                                 nodeParent.left.p = null;
                                 return;
@@ -247,9 +247,9 @@ public class BalancedTree {
         if(node.equals(root) && node.left == null){
             return null;
         }
-        if(node.getClass().getSimpleName().equals(Leaf.class.getSimpleName())){
+        if(node instanceof Leaf){
             if(node.key.compareTo(key) == 0 ){
-                return (Leaf)node;
+                    return (Leaf)node;
             }
             else{
                 return null;
@@ -274,7 +274,7 @@ public class BalancedTree {
         if (node.size < index){
             return null;
         }
-        if (node.getClass().getSimpleName().equals(Leaf.class.getSimpleName())){
+        if (node instanceof Leaf){
             return node;
         }
         int sizeLeftMiddle = 0;
