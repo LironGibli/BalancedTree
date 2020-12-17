@@ -6,38 +6,38 @@ public class BalancedTree {
     public void insert(Key newKey, Value newValue){
         Leaf newLeaf = new Leaf(newKey.createCopy(), newValue.createCopy());
         Node placementNode = root;
-        if (placementNode.left == null){ // this will happen only when we have tree with just root internal node <=> first leaf insertion
+        if (placementNode.getLeft() == null){ // this will happen only when we have tree with just root internal node <=> first leaf insertion
             setChildren(placementNode, newLeaf, null, null);
         }
-        else if (placementNode.middle == null){ // second leaf insertion
-            if (newLeaf.key.compareTo(placementNode.left.key) < 0){
-                setChildren(placementNode, newLeaf, placementNode.left, null);
+        else if (placementNode.getMiddle() == null){ // second leaf insertion
+            if (newLeaf.getKey().compareTo(placementNode.getLeft().getKey()) < 0){
+                setChildren(placementNode, newLeaf, placementNode.getLeft(), null);
             }
             else{
-                setChildren(placementNode, placementNode.left, newLeaf, null);
+                setChildren(placementNode, placementNode.getLeft(), newLeaf, null);
             }
         }
         else{
             while (!(placementNode instanceof Leaf)){
-                if (newLeaf.key.compareTo(placementNode.left.key) < 0){
-                    placementNode = placementNode.left;
+                if (newLeaf.getKey().compareTo(placementNode.getLeft().getKey()) < 0){
+                    placementNode = placementNode.getLeft();
                 }
-                else if ((newLeaf.key.compareTo(placementNode.middle.key) < 0)){
-                    placementNode = placementNode.middle;
+                else if ((newLeaf.getKey().compareTo(placementNode.getMiddle().getKey()) < 0)){
+                    placementNode = placementNode.getMiddle();
                 }
                 else{
-                    if (placementNode.right != null){
-                        placementNode = placementNode.right;
+                    if (placementNode.getRight() != null){
+                        placementNode = placementNode.getRight();
                     }
                     else{
-                        placementNode = placementNode.middle;
+                        placementNode = placementNode.getMiddle();
                     }
                 }
             }
-            Node parent = placementNode.p;
+            Node parent = placementNode.getP();
             Node climbingNode = insertAndSplit(parent, newLeaf);
             while (!parent.equals(root)){
-                parent = parent.p;
+                parent = parent.getP();
                 if(climbingNode != null){
                     climbingNode = insertAndSplit(parent, climbingNode);
                 }
@@ -55,44 +55,44 @@ public class BalancedTree {
     public void delete(Key key) {
         Node nodeToDelete = keySearch(root, key);
         if (nodeToDelete != null) {
-            Node nodeParent = nodeToDelete.p;
-            if ((nodeParent.equals(root)) && (nodeParent.middle == null)) {
-                nodeParent.left = null;
-                nodeParent.key = null;
-                nodeParent.minKey = null;
-                nodeParent.sum = null;
-                nodeParent.size = 0;
+            Node nodeParent = nodeToDelete.getP();
+            if ((nodeParent.equals(root)) && (nodeParent.getMiddle() == null)) {
+                nodeParent.setLeft(null);
+                nodeParent.setKey(null);
+                nodeParent.setMinKey(null);
+                nodeParent.setSum(null);
+                nodeParent.setSize(0);
             }
             else {
-                if (nodeToDelete.equals(nodeParent.left)) {
-                    setChildren(nodeParent, nodeParent.middle, nodeParent.right, null);
+                if (nodeToDelete.equals(nodeParent.getLeft())) {
+                    setChildren(nodeParent, nodeParent.getMiddle(), nodeParent.getRight(), null);
                 }
-                else if (nodeToDelete.equals(nodeParent.middle)) {
-                    setChildren(nodeParent, nodeParent.left, nodeParent.right, null);
+                else if (nodeToDelete.equals(nodeParent.getMiddle())) {
+                    setChildren(nodeParent, nodeParent.getLeft(), nodeParent.getRight(), null);
                 }
                 else {
-                    setChildren(nodeParent, nodeParent.left, nodeParent.middle, null);
+                    setChildren(nodeParent, nodeParent.getLeft(), nodeParent.getMiddle(), null);
                 }
                 while (nodeParent != null) {
-                    if (nodeParent.middle == null) {
+                    if (nodeParent.getMiddle() == null) {
                         if (!nodeParent.equals(root)) {
                             nodeParent = borrowOrMerge(nodeParent);
                         }
                         else {
-                            if (!(nodeParent.left instanceof Leaf)) {
-                                root = (InternalNode) nodeParent.left;
-                                nodeParent.left.p = null;
+                            if (!(nodeParent.getLeft() instanceof Leaf)) {
+                                root = (InternalNode) nodeParent.getLeft();
+                                nodeParent.getLeft().setP(null);
                                 return;
                             }
                             else {
                                 updateKey(nodeParent);
-                                nodeParent = nodeParent.p;
+                                nodeParent = nodeParent.getP();
                             }
                         }
                     }
                     else {
                         updateKey(nodeParent);
-                        nodeParent = nodeParent.p;
+                        nodeParent = nodeParent.getP();
                     }
                 }
             }
@@ -111,17 +111,17 @@ public class BalancedTree {
         Leaf foundNode = keySearch(root,key);
         if (foundNode != null){
            int rank = 1;
-           Node nodeParent = foundNode.p;
+           Node nodeParent = foundNode.getP();
            Node climbingNode = foundNode;
            while (nodeParent != null){
-               if (climbingNode.equals(nodeParent.middle)){
-                   rank += nodeParent.left.size;
+               if (climbingNode.equals(nodeParent.getMiddle())){
+                   rank += nodeParent.getLeft().getSize();
                }
-               else if(climbingNode.equals(nodeParent.right)){
-                   rank += nodeParent.left.size + nodeParent.middle.size;
+               else if(climbingNode.equals(nodeParent.getRight())){
+                   rank += nodeParent.getLeft().getSize() + nodeParent.getMiddle().getSize();
                }
                climbingNode = nodeParent;
-               nodeParent = nodeParent.p;
+               nodeParent = nodeParent.getP();
            }
            return rank;
         }
@@ -136,7 +136,7 @@ public class BalancedTree {
         else{
             Node foundNode = selectRecursive(root, index);
             if (foundNode != null){
-                return foundNode.key.createCopy();
+                return foundNode.getKey().createCopy();
             }
             else {
                 return null;
@@ -147,39 +147,39 @@ public class BalancedTree {
         return sumValuesInIntervalRecursive(root, key1, key2);
         }
     private void updateKey(Node node){
-        node.key = node.left.key;
-        node.minKey = node.left.minKey;
-        node.size = node.left.size;
-        node.sum = node.left.sum.createCopy();
-        if (node.middle != null) {
-            node.key = node.middle.key;
-            node.size += node.middle.size;
-            node.sum.addValue(node.middle.sum);
+        node.setKey(node.getLeft().getKey());
+        node.setMinKey(node.getLeft().getMinKey());
+        node.setSize(node.getLeft().getSize());
+        node.setSum(node.getLeft().getSum().createCopy());
+        if (node.getMiddle() != null) {
+            node.setKey(node.getMiddle().getKey());
+            node.setSize(node.getSize()+ node.getMiddle().getSize());
+            node.getSum().addValue(node.getMiddle().getSum());
         }
-        if (node.right != null) {
-            node.key = node.right.key;
-            node.size += node.right.size;
-            node.sum.addValue(node.right.sum);
+        if (node.getRight() != null) {
+            node.setKey(node.getRight().getKey());
+            node.setSize(node.getSize() + node.getRight().getSize());
+            node.getSum().addValue(node.getRight().getSum());
         }
     }
     private void setChildren(Node parent, Node left, Node middle, Node right){
-        parent.left = left;
-        parent.middle = middle;
-        parent.right = right;
-        left.p = parent;
-        if (middle != null) middle.p = parent;
-        if (right != null) right.p = parent;
+        parent.setLeft(left);
+        parent.setMiddle(middle);
+        parent.setRight(right);
+        left.setP(parent);
+        if (middle != null) middle.setP(parent);
+        if (right != null) right.setP(parent);
         updateKey(parent);
     }
     private Node insertAndSplit(Node parent, Node children){
-        Node left = parent.left;
-        Node middle = parent.middle;
-        Node right = parent.right;
+        Node left = parent.getLeft();
+        Node middle = parent.getMiddle();
+        Node right = parent.getRight();
         if (right == null){
-            if (children.key.compareTo(left.key) < 0) { // children.key < left.key
+            if (children.getKey().compareTo(left.getKey()) < 0) { // children.key < left.key
                 setChildren(parent, children, left, middle);
             }
-            else if (children.key.compareTo(middle.key) < 0){
+            else if (children.getKey().compareTo(middle.getKey()) < 0){
                 setChildren(parent, left, children, middle);
             }
             else{
@@ -187,16 +187,16 @@ public class BalancedTree {
             }
             return null;
         }
-        InternalNode parentSibling = new InternalNode(parent.p);
-        if (children.key.compareTo(left.key) < 0){ // HERE WE NEED TO CHECK WHAT IS THE DIFFERENCE BETWEEN HAVING SENTINELS AND NOT HAVING THEM, MAYBE WE NEED TO CHECK IF IT IS THE SMALLEST KEY IN THE LEAVES? MAYBE ADDING ATTRIBUTE TO THE DATA STRUCTURE OF SMALLEST AND LARGEST LEAF?
+        InternalNode parentSibling = new InternalNode(parent.getP());
+        if (children.getKey().compareTo(left.getKey()) < 0){ // HERE WE NEED TO CHECK WHAT IS THE DIFFERENCE BETWEEN HAVING SENTINELS AND NOT HAVING THEM, MAYBE WE NEED TO CHECK IF IT IS THE SMALLEST KEY IN THE LEAVES? MAYBE ADDING ATTRIBUTE TO THE DATA STRUCTURE OF SMALLEST AND LARGEST LEAF?
             setChildren(parent, children, left, null);
             setChildren(parentSibling, middle, right, null);
         }
-        else if(children.key.compareTo(middle.key) < 0){
+        else if(children.getKey().compareTo(middle.getKey()) < 0){
             setChildren(parent, left, children, null);
             setChildren(parentSibling, middle, right, null);
         }
-        else if(children.key.compareTo(right.key) < 0){
+        else if(children.getKey().compareTo(right.getKey()) < 0){
             setChildren(parent, left, middle, null);
             setChildren(parentSibling, children, right, null);
         }
@@ -207,63 +207,63 @@ public class BalancedTree {
         return parentSibling;
     }
     private Node borrowOrMerge(Node node){
-        Node nodeParent = node.p;
-        if(node.equals(nodeParent.left)){
-            Node nodeSibling = nodeParent.middle;
-            if (nodeSibling.right != null) {
-                setChildren(node, node.left, nodeSibling.left, null);
-                setChildren(nodeSibling, nodeSibling.middle, nodeSibling.right, null);
+        Node nodeParent = node.getP();
+        if(node.equals(nodeParent.getLeft())){
+            Node nodeSibling = nodeParent.getMiddle();
+            if (nodeSibling.getRight() != null) {
+                setChildren(node, node.getLeft(), nodeSibling.getLeft(), null);
+                setChildren(nodeSibling, nodeSibling.getMiddle(), nodeSibling.getRight(), null);
             } else {
-                setChildren(nodeSibling, node.left, nodeSibling.left, nodeSibling.middle);
+                setChildren(nodeSibling, node.getLeft(), nodeSibling.getLeft(), nodeSibling.getMiddle());
                 //GARBAGE COLLECT THE NODE
-                setChildren(nodeParent, nodeSibling, nodeParent.right, null);
+                setChildren(nodeParent, nodeSibling, nodeParent.getRight(), null);
             }
             return nodeParent;
         }
-        else if(node.equals(nodeParent.middle)){
-            Node nodeSibling = nodeParent.left;
-            if (nodeSibling.right != null) {
-                setChildren(node, nodeSibling.right, node.left, null);
-                setChildren(nodeSibling, nodeSibling.left, nodeSibling.middle, null);
+        else if(node.equals(nodeParent.getMiddle())){
+            Node nodeSibling = nodeParent.getLeft();
+            if (nodeSibling.getRight() != null) {
+                setChildren(node, nodeSibling.getRight(), node.getLeft(), null);
+                setChildren(nodeSibling, nodeSibling.getLeft(), nodeSibling.getMiddle(), null);
             } else {
-                setChildren(nodeSibling, nodeSibling.left, nodeSibling.middle, node.left);
+                setChildren(nodeSibling, nodeSibling.getLeft(), nodeSibling.getMiddle(), node.getLeft());
                 //GARBAGE COLLECT THE NODE
-                setChildren(nodeParent, nodeSibling, nodeParent.right, null);
+                setChildren(nodeParent, nodeSibling, nodeParent.getRight(), null);
             }
             return nodeParent;
         }
-        Node nodeSibling = nodeParent.middle;
-        if (nodeSibling.right != null) {
-            setChildren(node, nodeSibling.right, node.left, null);
-            setChildren(nodeSibling, nodeSibling.left, nodeSibling.middle, null);
+        Node nodeSibling = nodeParent.getMiddle();
+        if (nodeSibling.getRight() != null) {
+            setChildren(node, nodeSibling.getRight(), node.getLeft(), null);
+            setChildren(nodeSibling, nodeSibling.getLeft(), nodeSibling.getMiddle(), null);
         } else {
-            setChildren(nodeSibling, nodeSibling.left, nodeSibling.middle, node.left);
+            setChildren(nodeSibling, nodeSibling.getLeft(), nodeSibling.getMiddle(), node.getLeft());
             //GARBAGE COLLECT THE NODE
-            setChildren(nodeParent, nodeParent.left, nodeSibling, null);
+            setChildren(nodeParent, nodeParent.getLeft(), nodeSibling, null);
         }
         return nodeParent;
         }
     private Leaf keySearch(Node node, Key key){
-        if(node.equals(root) && node.left == null){
+        if(node.equals(root) && node.getLeft() == null){
             return null;
         }
         if(node instanceof Leaf){
-            if(node.key.compareTo(key) == 0 ){
+            if(node.getKey().compareTo(key) == 0 ){
                     return (Leaf)node;
             }
             else{
                 return null;
             }
         }
-        if(key.compareTo(node.left.key)<=0){
-            return keySearch(node.left, key);
+        if(key.compareTo(node.getLeft().getKey())<=0){
+            return keySearch(node.getLeft(), key);
         }
-        else if((node.middle != null) && key.compareTo(node.middle.key)<=0){
-            return keySearch(node.middle, key);
+        else if((node.getMiddle() != null) && key.compareTo(node.getMiddle().getKey())<=0){
+            return keySearch(node.getMiddle(), key);
         }
         else{
-            if((node.right != null) && (key.compareTo(node.right.key)<=0)){
-                return keySearch(node.right, key);
+            if((node.getRight() != null) && (key.compareTo(node.getRight().getKey())<=0)){
+                return keySearch(node.getRight(), key);
             }
             else{
                 return null;
@@ -271,46 +271,46 @@ public class BalancedTree {
         }
     }
     private Node selectRecursive(Node node,int index){
-        if (node.size < index){
+        if (node.getSize() < index){
             return null;
         }
         if (node instanceof Leaf){
             return node;
         }
         int sizeLeftMiddle = 0;
-        int sizeLeft = node.left.size;
-        if (node.middle != null){
-            sizeLeftMiddle = sizeLeft + node.middle.size;
+        int sizeLeft = node.getLeft().getSize();
+        if (node.getMiddle() != null){
+            sizeLeftMiddle = sizeLeft + node.getMiddle().getSize();
         }
         if (index <= sizeLeft){
-            return selectRecursive(node.left, index);
+            return selectRecursive(node.getLeft(), index);
         }
-        else if (index <= sizeLeftMiddle && node.middle != null){
-            return selectRecursive(node.middle, index - sizeLeft);
+        else if (index <= sizeLeftMiddle && node.getMiddle() != null){
+            return selectRecursive(node.getMiddle(), index - sizeLeft);
         }
         else{
-            return selectRecursive(node.right, index - sizeLeftMiddle);
+            return selectRecursive(node.getRight(), index - sizeLeftMiddle);
         }
     }
     private Value sumValuesInIntervalRecursive(Node node,Key key1, Key key2){
-        if(node.equals(root) && node.left == null){
+        if(node.equals(root) && node.getLeft() == null){
             return null;
         }
-        if ((node.minKey.compareTo(key1) >= 0) && (node.key.compareTo(key2) <= 0)){
-            return node.sum.createCopy();
+        if ((node.getMinKey().compareTo(key1) >= 0) && (node.getKey().compareTo(key2) <= 0)){
+            return node.getSum().createCopy();
         }
-        else if ((node.minKey.compareTo(key2) > 0) || (node.key.compareTo(key1) < 0)){
+        else if ((node.getMinKey().compareTo(key2) > 0) || (node.getKey().compareTo(key1) < 0)){
             return null;
         }
         else{
-            Value val1 = sumValuesInIntervalRecursive(node.left, key1, key2);
+            Value val1 = sumValuesInIntervalRecursive(node.getLeft(), key1, key2);
             Value val2 = null;
-            if (node.middle != null) {
-                val2 = sumValuesInIntervalRecursive(node.middle, key1, key2);
+            if (node.getMiddle() != null) {
+                val2 = sumValuesInIntervalRecursive(node.getMiddle(), key1, key2);
             }
             Value val3 = null;
-            if (node.right != null) {
-                val3 = sumValuesInIntervalRecursive(node.right, key1, key2);
+            if (node.getRight() != null) {
+                val3 = sumValuesInIntervalRecursive(node.getRight(), key1, key2);
             }
             if (val1 != null){
                 if (val2 != null) {
