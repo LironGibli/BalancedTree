@@ -1,4 +1,4 @@
-public interface    Value
+public interface Value
 {
     Value createCopy();
     void addValue(Value valueToAdd);

@@ -247,16 +247,33 @@ public class Test
             key1 = myKeysArray[randomIndex];
             switch (operation)
             {
-                case RANK -> test.printRank(key1, T.rank(key1));
-                case DELETE -> T.delete(key1);
-                case INSERT ->
+                case RANK:
+                {
+                    test.printRank(key1, T.rank(key1));
+                    break;
+                }
+                case DELETE:
+                {
+                    T.delete(key1);
+                    break;
+                }
+                case INSERT:
                 {
                     T.insert(myKeysArray[currentIndexToInsert], myValuesArray[currentIndexToInsert]);
                     currentIndexToInsert += 1;
+                    break;
                 }
-                case SEARCH -> test.printSearch(key1, (MyValue) T.search(key1));
-                case SELECT -> test.printSelect(randomIndex, (MyKey) T.select(randomIndex));
-                case SUM_VALUES_IN_INTERVAL ->
+                case SEARCH:
+                {
+                    test.printSearch(key1, (MyValue) T.search(key1));
+                    break;
+                }
+                case SELECT:
+                {
+                    test.printSelect(randomIndex, (MyKey) T.select(randomIndex));
+                    break;
+                }
+                case SUM_VALUES_IN_INTERVAL:
                 {
                     key1 = myKeysArray[random.nextInt(myKeysArray.length)];
                     key2 = myKeysArray[random.nextInt(myKeysArray.length)];
@@ -268,6 +285,7 @@ public class Test
                     {
                         test.printSumInInterval(key2, key1, (MyValue) T.sumValuesInInterval(key2, key1));
                     }
+                    break;
                 }
             }
         }
